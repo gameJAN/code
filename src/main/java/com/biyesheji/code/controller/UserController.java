@@ -1,6 +1,8 @@
 package com.biyesheji.code.controller;
 
+import com.biyesheji.code.entity.Article;
 import com.biyesheji.code.entity.User;
+import com.biyesheji.code.service.ArticleService;
 import com.biyesheji.code.service.UserService;
 import com.biyesheji.code.util.Consts;
 import com.biyesheji.code.util.CryptographyUtil;
@@ -9,15 +11,14 @@ import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.subject.Subject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.HttpSessionRequiredException;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpSession;
@@ -37,6 +38,9 @@ public class UserController {
     @Resource
     private JavaMailSender mailSender;
     /*用户注册*/
+
+    @Autowired
+    private ArticleService articleService;
 
 
     @ResponseBody
@@ -110,62 +114,79 @@ public class UserController {
 
     @ResponseBody
     @PostMapping("/sendEmail")
-    public Map<String,Object> sendEmail(String email , HttpSession session){
+    public Map<String,Object> sendEmail(String email, HttpSession session){
         Map<String,Object> map = new HashMap<>();
         if(StringUtil.isEmpty(email)){
             map.put("success",false);
-            map.put("errorInfo","邮箱不能为空!");
-            return  map;
+            map.put("errorInfo","邮箱不能为空！");
+            return map;
         }
-        /*验证邮件是否存在*/
-
+        //验证邮件是否存在
         User u = userService.findByEmail(email);
-        if (u == null){
+        if(u==null){
             map.put("success",false);
-            map.put("errorInfo","邮箱不存在");
+            map.put("errorInfo","邮箱不存在！");
             return map;
         }
         String mailCode = StringUtil.genSixRandom();
-        SimpleMailMessage message = new SimpleMailMessage();
-        message.setFrom("yu980880532@163.com");
-        message.setTo(email);
-        message.setSubject("验证码");
-        message.setTo("您的验证码为:" + mailCode);
+        //发邮件
+        SimpleMailMessage message = new SimpleMailMessage();        //消息构造器
+        message.setFrom("yu980880532@163.com");                        //发件人
+        message.setTo(email);                                       //收件人
+        message.setSubject("用户找回密码");         //主题
+        message.setText("您本次的验证码是：" +mailCode);            //正文内容
         mailSender.send(message);
         System.out.println(mailCode);
-        //把验证码存到session里面
+        //验证码存到session
         session.setAttribute(Consts.MAIL_CODE_NAME,mailCode);
         session.setAttribute(Consts.USER_ID_NAME,u.getUserId());
 
         map.put("success",true);
-
-
-
         return map;
     }
+
     /*邮件验证码判断*/
     @ResponseBody
     @PostMapping("/checkYzm")
-    public Map<String,Object> checkYzm(String yzm ,HttpSession session){
+    public Map<String,Object> checkYzm(String yzm, HttpSession session){
         Map<String,Object> map = new HashMap<>();
-        if (StringUtil.isEmpty(yzm)){
+        if(StringUtil.isEmpty(yzm)){
             map.put("success",false);
-            map.put("errorInfo","验证码不能为空");
+            map.put("errorInfo","验证码不能为空！");
             return map;
         }
         String mailCode = (String) session.getAttribute(Consts.MAIL_CODE_NAME);
         Integer userId = (Integer) session.getAttribute(Consts.USER_ID_NAME);
+
         if(!yzm.equals(mailCode)){
             map.put("success",false);
-            map.put("errorInfo","验证码错误");
+            map.put("errorInfo","验证码错误！");
             return map;
         }
+
+        //给用户重置密码为123456
         User user = userService.getById(userId);
         user.setPassword((CryptographyUtil.md5(Consts.PASSWORD,CryptographyUtil.SALT)));
         userService.save(user);
         map.put("success",true);
         return map;
+    }
+    /*资源管理*/
+    @GetMapping("/articleManage")
+    public String articleManage(){
+        return "/user/articleManage";
+    }
+    /*根据条件分页查询信息列表*/
+    public Map<String,Object> articleList(Article s_article, @RequestParam(value = "page",required = false)Integer page,
+                                          @RequestParam(value = "page",required = false)Integer pageSize,HttpSession session){
 
+        Map<String,Object> map = new HashMap<>();
+        User currentUser =(User) session.getAttribute(Consts.CURRENT_USER);
+        s_article.setUser(currentUser);
+        map.put("data",articleService.list(s_article,null,null,null,page,pageSize, Sort.Direction.DESC,"publishDate"));
+        map.put("count",articleService.geCount(s_article,null,null,null));//总记录数
+        map.put("code",0);
+        return map;
 
     }
 

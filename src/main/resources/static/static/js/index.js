@@ -66,7 +66,7 @@ $(function () {
 function mzsm() {
     layui.use('layer', function(){
         var layer = layui.layer;
-        layer.msg("本站所有资源都是由网友分享，仅供学习和交流使用，如果侵权了您的合法权益，请发送邮件至2896543728@qq.com 我们立即处理。", {
+        layer.msg("个人学习交流使用", {
             time: 30000, //30s后自动关闭
             btn: ['明白了']
         });

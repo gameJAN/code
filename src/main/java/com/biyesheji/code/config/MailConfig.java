@@ -14,9 +14,9 @@ public class MailConfig {
     public MailSender mailSender(){
         JavaMailSenderImpl mailSender = new JavaMailSenderImpl();
         mailSender.setHost("smtp.163.com");     //指定发送Email的服务器主机名
-        mailSender.setPort(587);                //默认端口
+        mailSender.setPort(25);                //默认端口
         mailSender.setUsername("yu980880532@163.com");//用户名
-        mailSender.setPassword("yu18072715924");
+        mailSender.setPassword("yu980880532");
         return mailSender;
     }
 }

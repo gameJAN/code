@@ -7,7 +7,7 @@ public class StringUtil {
     /*判断字符串是否为空*/
 
     public static boolean isEmpty(String str){
-        if (str == null || str.trim().equals("")){
+        if (str == null || str.equals("")){
             return true;
         }
         return false;
@@ -15,7 +15,7 @@ public class StringUtil {
     /*判断字符串是否不为空*/
 
     public static boolean isNotEmpty(String str){
-        if (str != null && !str.trim().equals("")){
+        if (str != null && !str.equals("")){
             return true;
         }
         return false;
