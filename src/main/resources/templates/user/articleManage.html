@@ -47,5 +47,29 @@
     </div>
 </div>
 <div th:replace="common/footer::#f"></div>
+<script type="text/html" id="nameTpl">
+    <a href="/article/detail/{{d.articleId}}.html" target="_blank">{{d.name}}</a>
+</script>
+<script type="text/html" id="stateTpl">
+    {{# if(d.state==1){ }}
+    <button class="layui-btn layui-btn-danger layui-btn-xs"><i class="layui-icon">&#xe642;</i> 待审核</button>
+    {{# } else if(d.state==2){ }}
+    <font color="blue">审核通过</font>
+    {{# } else if(d.state==3){ }}
+    <a href="#" title="审核未通过原因：{{d.reason}}"><font color="red">审核未通过</font></a>
+    {{# } }}
+</script>
+
+<script type="text/html" id="barDemo">
+    <a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="edit"><i class="layui-icon">&#xe642;</i>编辑</a>
+    <a class="layui-btn layui-btn-warm layui-btn-xs" lay-event="del"><i class="layui-icon">&#xe640;</i>删除</a>
+</script>
+
+<script type="text/html" id="toolbarDemo">
+    <div class="layui-btn-container">
+        <button onclick="toAddArticle()" class="layui-btn layui-btn-warm layui-btn-radius layui-btn-sm"><i class="layui-icon">&#xe681;</i>发布资源</button>
+        <font color="red">（1、鼠标移到红色“审核未通过”字体上，能显示未通过原因；2、审核未通过的，请重新编辑帖子，然后提交审核。）</font>
+    </div>
+</script>
 </body>
 </html>

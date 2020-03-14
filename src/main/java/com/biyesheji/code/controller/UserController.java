@@ -177,8 +177,10 @@ public class UserController {
         return "/user/articleManage";
     }
     /*根据条件分页查询信息列表*/
+    @ResponseBody
+    @RequestMapping("/articleList")
     public Map<String,Object> articleList(Article s_article, @RequestParam(value = "page",required = false)Integer page,
-                                          @RequestParam(value = "page",required = false)Integer pageSize,HttpSession session){
+                                          @RequestParam(value = "limit",required = false)Integer pageSize,HttpSession session){
 
         Map<String,Object> map = new HashMap<>();
         User currentUser =(User) session.getAttribute(Consts.CURRENT_USER);
@@ -188,6 +190,12 @@ public class UserController {
         map.put("code",0);
         return map;
 
+    }
+
+    /*进入资源发布页面*/
+    @GetMapping("toAddArticle")
+    public String toAddArticle(){
+        return "/user/addArticle";
     }
 
 

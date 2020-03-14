@@ -76,7 +76,7 @@ function mzsm() {
 function sjvip() {
     layui.use('layer', function(){
         var layer = layui.layer;
-        layer.msg("成为本站VIP,享受全站资源免积分下载！请联系管理员：2896543728@qq.com (QQ同号)", {
+        layer.msg("成为本站VIP,享受全站资源免积分下载！请联系管理员 ", {
             time: 30000, //30s后自动关闭
             btn: ['明白了']
         });
@@ -86,7 +86,7 @@ function sjvip() {
 function jfcz() {
     layui.use('layer', function(){
         var layer = layui.layer;
-        layer.msg("充值积分，请联系管理员：2896543728@qq.com (QQ同号)", {
+        layer.msg("充值积分，请联系管理员", {
             time: 20000, //20s后自动关闭
             btn: ['明白了']
         });
