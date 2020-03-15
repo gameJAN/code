@@ -4,6 +4,7 @@ import com.biyesheji.code.entity.Article;
 import com.biyesheji.code.entity.User;
 import com.biyesheji.code.service.ArticleService;
 import com.biyesheji.code.service.UserService;
+import com.biyesheji.code.util.CheckShareLinkEnableUtil;
 import com.biyesheji.code.util.Consts;
 import com.biyesheji.code.util.CryptographyUtil;
 import com.biyesheji.code.util.StringUtil;
@@ -23,10 +24,12 @@ import org.springframework.web.bind.annotation.*;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
+import java.io.IOException;
 import java.nio.file.attribute.UserPrincipalNotFoundException;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Random;
 
 @Controller
 @RequestMapping(value = "/user")
@@ -196,6 +199,37 @@ public class UserController {
     @GetMapping("toAddArticle")
     public String toAddArticle(){
         return "/user/addArticle";
+    }
+
+    /*添加或修改资源*/
+    @ResponseBody
+    @RequestMapping("/saveArticle")
+    public Map<String,Object> saveArticle(Article article,HttpSession session) throws IOException {
+        Map<String,Object> resultMap = new HashMap<>();
+        if(article.getPoints()<0||article.getPoints()>10){
+            resultMap.put("success",false);
+            resultMap.put("erroInfo","积分超出正常区间!");
+            return resultMap;
+        }
+        if (!CheckShareLinkEnableUtil.check(article.getDownload())){
+            resultMap.put("success",false);
+            resultMap.put("erroInfo","分享链接已失效");
+            return resultMap;
+        }
+        User currentUser = (User)session.getAttribute(Consts.CURRENT_USER);
+        if (article.getArticleId()==null){  //添加资源
+            article.setPublishDate(new Date());
+            article.setUser(currentUser);
+            if (article.getPoints()==0){ //设置免费资源
+                article.setFree(true);
+            }
+            article.setState(1);//审核状态
+            article.setClick(new Random().nextInt(150)+50);   //设置点击数为50-200
+            articleService.save(article);
+            resultMap.put("success",true);
+
+        }
+        return resultMap;
     }
 
 
