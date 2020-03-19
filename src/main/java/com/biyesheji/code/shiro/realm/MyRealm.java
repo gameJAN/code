@@ -33,10 +33,13 @@ public class MyRealm extends AuthorizingRealm {
         SimpleAuthorizationInfo info =new SimpleAuthorizationInfo();
         Set<String> roles = new HashSet<>();
         if ("管理员".equals(user.getRoleName())){
-            roles.add("进入管理员主页");
+            roles.add("管理员");
+            info.addStringPermission("进入管理员主页");
+            info.addStringPermission("根据id查询资源类型实体");
+            info.addStringPermission("添加或修改资源类型信息");
         }
-
-        return null;
+        info.setRoles(roles);
+        return info;
     }
 /*
 权限认证

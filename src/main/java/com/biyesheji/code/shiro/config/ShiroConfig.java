@@ -50,8 +50,10 @@ public class ShiroConfig {
         filterChainDefinitionMap.put("/user/sendEmail","anon");
         filterChainDefinitionMap.put("/user/findPassword.html","anon");
         filterChainDefinitionMap.put("/user/checkYzm","anon");
+
         //配置退出过滤器,启动代码 SHRIO已经实现
         filterChainDefinitionMap.put("/user/logout","logout");
+        filterChainDefinitionMap.put("/admin/login.html","anon");
 
         filterChainDefinitionMap.put("/**","authc");
 
