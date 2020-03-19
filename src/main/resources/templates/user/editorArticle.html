@@ -22,16 +22,17 @@
         <div class="layui-form layui-form-pane">
             <div class="layui-tab layui-tab-brief" lay-filter="user">
                 <ul class="layui-tab-title">
-                    <li class="layui-this">发布新资源</li>
+                    <li class="layui-this">修改资源</li>
                 </ul>
                 <div class="layui-form layui-tab-content" id="LAY-ucm" style="padding: 20px 0;">
                     <div class="layui-tab-item layui-show">
                         <form action="" method="post">
+                            <input type="hidden" name="articleId" th:value="${article.articleId}">
                             <div class="layui-row layui-col-space15 layui-form-item">
                                 <div class="layui-col-md9">
                                     <label for="name" class="layui-form-label">名称</label>
                                     <div class="layui-input-block">
-                                        <input type="text" id="name" name="name" required lay-verify="required" autocomplete="off" class="layui-input">
+                                        <input type="text" id="name" name="name" th:value="${article.name}" required lay-verify="required" autocomplete="off" class="layui-input">
                                     </div>
                                 </div>
                                 <div class="layui-col-md3">
@@ -48,13 +49,13 @@
                                 <div class="layui-col-md9">
                                     <label for="download" class="layui-form-label">资源链接</label>
                                     <div class="layui-input-block">
-                                        <input type="text" id="download" name="download" required lay-verify="url" placeholder="请输入百度云分享链接" autocomplete="off" class="layui-input">
+                                        <input type="text" id="download" name="download" th:value="${article.download}" required lay-verify="url" placeholder="请输入百度云分享链接" autocomplete="off" class="layui-input">
                                     </div>
                                 </div>
                                 <div class="layui-col-md3">
                                     <label for="password" class="layui-form-label">密码</label>
                                     <div class="layui-input-block">
-                                        <input type="text" id="password" name="password" required lay-verify="pass" placeholder="资源密码" autocomplete="off" class="layui-input">
+                                        <input type="text" id="password" name="password"th:value="${article.password}" required lay-verify="pass" placeholder="资源密码" autocomplete="off" class="layui-input">
                                     </div>
                                 </div>
                             </div>
@@ -63,7 +64,7 @@
                                 <div class="layui-inline">
                                     <label for="keywords" class="layui-form-label">关键字</label>
                                     <div class="layui-input-inline" style="width: 400px;">
-                                        <input type="text" id="keywords" name="keywords" required lay-verify="required" autocomplete="off" class="layui-input">
+                                        <input type="text" id="keywords" name="keywords" th:value="${article.keywords}"required lay-verify="required" autocomplete="off" class="layui-input">
                                     </div>
                                     <div class="layui-form-mid layui-word-aux">
                                         网页搜索keywords，多以英文逗号分割。
@@ -75,7 +76,7 @@
                                 <div class="layui-inline">
                                     <label for="description" class="layui-form-label">资源描述</label>
                                     <div class="layui-input-inline" style="width: 400px;">
-                                        <input type="text" id="description" name="description" required lay-verify="required" autocomplete="off" class="layui-input">
+                                        <input type="text" id="description" name="description"th:value="${article.description}" required lay-verify="required" autocomplete="off" class="layui-input">
                                     </div>
                                     <div class="layui-form-mid layui-word-aux">
                                         网页搜索描述，利于seo优化
@@ -97,17 +98,17 @@
                                     <label class="layui-form-label">所需积分</label>
                                     <div class="layui-input-inline" style="widows: 190px;">
                                         <select name="points">
-                                            <option value="0">免费资源</option>
-                                            <option value="1">1个积分</option>
-                                            <option value="2">2个积分</option>
-                                            <option value="3">3个积分</option>
-                                            <option value="4">4个积分</option>
-                                            <option value="5">5个积分</option>
-                                            <option value="6">6个积分</option>
-                                            <option value="7">7个积分</option>
-                                            <option value="8">8个积分</option>
-                                            <option value="9">9个积分</option>
-                                            <option value="10">10个积分</option>
+                                            <option th:selected="${article.points==0}" value="0">免费资源</option>
+                                            <option th:selected="${article.points==1}"value="1">1个积分</option>
+                                            <option th:selected="${article.points==2}"value="2">2个积分</option>
+                                            <option th:selected="${article.points==3}"value="3">3个积分</option>
+                                            <option th:selected="${article.points==4}"value="4">4个积分</option>
+                                            <option th:selected="${article.points==5}"value="5">5个积分</option>
+                                            <option th:selected="${article.points==6}"value="6">6个积分</option>
+                                            <option th:selected="${article.points==7}"value="7">7个积分</option>
+                                            <option th:selected="${article.points==8}"value="8">8个积分</option>
+                                            <option th:selected="${article.points==9}"value="9">9个积分</option>
+                                            <option th:selected="${article.points==10}"value="10">10个积分</option>
                                         </select>
                                     </div>
                                     <div class="layui-form-mid layui-word-aux">
@@ -221,7 +222,7 @@
             ]
         });
         editor.ready(function(){
-            editor.setContent("这里是资源主体内容。");
+            editor.setContent([${article.content}]);
         });
     });
 
@@ -239,6 +240,7 @@
             var _data = data.field;
             var url="/user/saveArticle";
             var name=_data.name;
+            var articleId = _data.articleId;
             var arcType = _data.arcType;
             var download = _data.download;
             var keywords = _data.keywords;
@@ -254,7 +256,7 @@
                 layer.msg("积分超出");
             } else {
                 $("#tjan").attr({"disabled":"disabled"});
-                var data={name:name,arcType:arcType,download:download,password:password,keywords:keywords,description:description,content:content,points:points};
+                var data={articleId:articleId,name:name,arcType:arc,download:download,password:password,keywords:keywords,description:description,content:content,points:points};
                 $.ajax({
                     type:"POST",
                     url:url,

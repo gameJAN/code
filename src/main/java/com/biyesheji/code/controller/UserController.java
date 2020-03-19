@@ -20,6 +20,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.HttpSessionRequiredException;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.ModelAndView;
+import sun.net.httpserver.HttpsServerImpl;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpSession;
@@ -203,7 +205,7 @@ public class UserController {
 
     /*添加或修改资源*/
     @ResponseBody
-    @RequestMapping("/saveArticle")
+    @PostMapping("/saveArticle")
     public Map<String,Object> saveArticle(Article article,HttpSession session) throws IOException {
         Map<String,Object> resultMap = new HashMap<>();
         if(article.getPoints()<0||article.getPoints()>10){
@@ -228,9 +230,70 @@ public class UserController {
             articleService.save(article);
             resultMap.put("success",true);
 
+        }else{
+            Article oldArticle =articleService.getById(article.getArticleId());
+            if (oldArticle.getUser().getUserId().intValue()== currentUser.getUserId().intValue()){
+                oldArticle.setName(article.getName());
+                oldArticle.setArcType(article.getArcType());
+                oldArticle.setDownload(article.getDownload());
+                oldArticle.setPassword(article.getPassword());
+                oldArticle.setKeywords(article.getKeywords());
+                oldArticle.setDescription(article.getDescription());
+                oldArticle.setContent(article.getContent());
+                if (oldArticle.getState()==3){
+                    oldArticle.setState(1);
+                }
+                articleService.save(oldArticle);
+                //-TODO 更新时需要把新资源信息放入lucene
+                resultMap.put("success",true);
+
+            }
         }
         return resultMap;
     }
 
+    @ResponseBody
+    @RequestMapping("/checkArticleUser")
+    public Map<String,Object> checkArticleUser(Integer articleId, HttpSession session){
+        Map<String,Object> resultMap = new HashMap<>();
+        User currentUser = (User)session.getAttribute(Consts.CURRENT_USER);
+        Article article = articleService.getById(articleId);
+        if (article.getUser().getUserId().intValue() == currentUser.getUserId().intValue()){
+            resultMap.put("success",true);
+        }else {
+            resultMap.put("success",false);
+            resultMap.put("erroInfo","您不是资源所有者，不能修改");
+        }
+        return resultMap;
+    }
+
+    /*进去资源修改页面*/
+    @GetMapping("/toEditorArticle/{articleId}")
+    public ModelAndView toEditArticle(@PathVariable(value = "articleId",required = true)Integer articleId){
+        ModelAndView mav = new ModelAndView();
+        Article article =articleService.getById(articleId);
+        mav.setViewName("/user/editArticle");
+        return mav;
+    }
+
+    /*根据id删除一条资源*/
+    @ResponseBody
+    @RequestMapping("/articleDelete")
+    public Map<String,Object> articleDelete(Integer articleId,HttpSession session){
+        Map<String,Object> resultMap = new HashMap<>();
+        User currentUser = (User)session.getAttribute(Consts.CURRENT_USER);
+        Article article = articleService.getById(articleId);
+        if (article.getUser().getUserId().intValue()== currentUser.getUserId().intValue()){
+            //TODO 需要先删除评论
+            articleService.delete(articleId);
+            //TODO 需要把资源从lucene里面删除
+            resultMap.put("success",true);
+
+        }else {
+            resultMap.put("success",false);
+            resultMap.put("erroInfo","您不是资源所有者，不能删除");
+        }
+        return resultMap;
+    }
 
 }
