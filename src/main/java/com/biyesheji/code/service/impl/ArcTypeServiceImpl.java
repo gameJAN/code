@@ -32,8 +32,14 @@ public class ArcTypeServiceImpl  implements ArcTypeService {
         if (redisTemplate.hasKey(Consts.ALL_ARC_TYPE_NAME)){
             return redisTemplate.opsForList().range(Consts.ALL_ARC_TYPE_NAME,0,-1);
         }else {
-            return arcTypeRepository.findAll(Sort.by(direction,properties));
+            List list = arcTypeRepository.findAll(Sort.by(direction,properties));
+            if(list!=null&&list.size()>0){
+                for (int i = 0; i < list.size(); i++) {
+                    redisTemplate.opsForList().rightPush(Consts.ALL_ARC_TYPE_NAME,(ArcType)list.get(i));
 
+                }
+            }
+            return list;
         }
     }
 

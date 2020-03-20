@@ -17,4 +17,7 @@ public class Consts {
 
     /*资源类型和名称*/
     public static final String ALL_ARC_TYPE_NAME="allArcType";
+
+    /*所有资源分类*/
+    public static final String ARC_TYPE_LIST="arcTypeList";
 }

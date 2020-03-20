@@ -39,7 +39,7 @@
                                     <div class="layui-input-block">
                                         <select required lay-verify="required" name="arcType" lay-filter="column">
                                             <option></option>
-                                            <option th:each="arcType:${application.arcTypeList}" th:value="${arcType.arcTypeId}" th:text="${arcType.arcTypeName}"></option>                                        </select>
+                                            <option th:selected="${article.arcType.arcTypeId == arcType.arcTypeId}" th:each="arcType:${application.arcTypeList}" th:value="${arcType.arcTypeId}" th:text="${arcType.arcTypeName}"></option>                                        </select>
                                     </div>
                                 </div>
                             </div>
